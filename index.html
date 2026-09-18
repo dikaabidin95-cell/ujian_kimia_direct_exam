@@ -177,6 +177,101 @@
 
 <div id="hasil"></div>
   </main>
+<script>
+  let scanner = null;
+  let scanDiizinkan = false;
+  let sedangMemproses = false;
 
+  const startScanBtn =
+    document.getElementById("startScanBtn");
+
+  const overlay =
+    document.getElementById("scanStartOverlay");
+
+  const hasil =
+    document.getElementById("hasil");
+
+  startScanBtn.addEventListener("click", function () {
+
+    scanDiizinkan = true;
+    startScanBtn.disabled = true;
+    startScanBtn.innerText = "MEMBUKA KAMERA...";
+
+    if (!document.fullscreenElement &&
+        document.documentElement.requestFullscreen) {
+
+      document.documentElement
+        .requestFullscreen()
+        .catch(function () {});
+    }
+
+    scanner = new Html5Qrcode("reader");
+
+    scanner.start(
+      { facingMode: "environment" },
+
+      {
+        fps: 10,
+        qrbox: {
+          width: 250,
+          height: 250
+        }
+      },
+
+      function (decodedText) {
+
+        if (!scanDiizinkan) {
+          return;
+        }
+
+        if (sedangMemproses) {
+          return;
+        }
+
+        sedangMemproses = true;
+
+        hasil.innerHTML = `
+          <div>
+            NIS TERBACA
+          </div>
+          <div style="margin-top:8px;font-size:26px;">
+            ${decodedText}
+          </div>
+        `;
+
+        scanner.stop()
+          .catch(function () {});
+      },
+
+      function () {
+        // Abaikan kesalahan scan sementara
+      }
+    )
+    .then(function () {
+
+      overlay.style.display = "none";
+
+      hasil.innerHTML = `
+        <div>
+          MENUNGGU SCAN
+        </div>
+      `;
+
+    })
+    .catch(function (error) {
+
+      startScanBtn.disabled = false;
+      startScanBtn.innerText = "MULAI SCAN →";
+
+      hasil.innerHTML = `
+        <div style="color:#c62828;">
+          KAMERA TIDAK DAPAT DIAKTIFKAN
+        </div>
+      `;
+
+      console.error(error);
+    });
+  });
+</script>
 </body>
 </html>
