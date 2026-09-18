@@ -220,28 +220,67 @@
 
       function (decodedText) {
 
-        if (!scanDiizinkan) {
-          return;
-        }
+  if (!scanDiizinkan) {
+    return;
+  }
 
-        if (sedangMemproses) {
-          return;
-        }
+  if (sedangMemproses) {
+    return;
+  }
 
-        sedangMemproses = true;
+  sedangMemproses = true;
 
-        hasil.innerHTML = `
-          <div>
-            NIS TERBACA
-          </div>
-          <div style="margin-top:8px;font-size:26px;">
-            ${decodedText}
-          </div>
-        `;
+  const nis = String(decodedText || "").trim();
 
-        scanner.stop()
-          .catch(function () {});
-      },
+  hasil.innerHTML = `
+    <div>
+      MENCATAT NIS...
+    </div>
+    <div style="margin-top:8px;font-size:26px;">
+      ${nis}
+    </div>
+  `;
+
+  scanner.stop()
+    .catch(function () {});
+
+  const apiUrl =
+    "https://script.google.com/macros/s/AKfycbwxeW6ZSki-s_3m04SUolyJ_Q1zEbGTgNNDDE4J4GVEV-gAyvJaspzzcLRhCFw5OE1yow/exec";
+
+  fetch(
+    apiUrl +
+    "?mode=catat_ujian&id=" +
+    encodeURIComponent(nis),
+    {
+      method: "GET",
+      mode: "no-cors"
+    }
+  )
+  .then(function () {
+
+    hasil.innerHTML = `
+      <div>
+        NIS TERCATAT
+      </div>
+      <div style="margin-top:8px;font-size:26px;">
+        ${nis}
+      </div>
+    `;
+
+  })
+  .catch(function (error) {
+
+    sedangMemproses = false;
+
+    hasil.innerHTML = `
+      <div style="color:#c62828;">
+        GAGAL MENCATAT NIS
+      </div>
+    `;
+
+    console.error(error);
+  });
+},
 
       function () {
         // Abaikan kesalahan scan sementara
