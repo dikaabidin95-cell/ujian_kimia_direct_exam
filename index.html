@@ -482,11 +482,14 @@ const intervalCountdown =
     updateCountdown,
     1000
   );
-  // ===================================================
-  // PANGGIL API WAKTU DENGAN JSONP
-  // ===================================================
 
-  const script =
+};
+
+// ===================================================
+// PANGGIL API WAKTU DENGAN JSONP
+// ===================================================
+  
+    const script =
     document.createElement("script");
 
   script.src =
@@ -507,12 +510,11 @@ const intervalCountdown =
     sedangMemproses = false;
   };
 
-    document.body.appendChild(script);
-
-  };
+   document.body.appendChild(script);
 
 })
-  .catch(function (error) {
+
+.catch(function (error) {
     sedangMemproses = false;
 
     hasil.innerHTML = `
