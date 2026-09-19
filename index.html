@@ -309,53 +309,73 @@
 
     if (sekarang < mulai) {
 
-      const selisih =
-        mulai - sekarang;
+  const offsetServer =
+    sekarang - Date.now();
 
-      const jam =
-        Math.floor(selisih / 3600000);
+  function updateCountdownSebelumMulai() {
 
-      const menit =
-        Math.floor(
-          (selisih % 3600000) / 60000
-        );
+    const sekarangServer =
+      Date.now() + offsetServer;
 
-      const detik =
-        Math.floor(
-          (selisih % 60000) / 1000
-        );
+    const selisih =
+      mulai - sekarangServer;
 
+    if (selisih <= 0) {
       hasil.innerHTML = `
         <div>
-          UJIAN BELUM DIMULAI
-        </div>
-
-        <div style="
-          margin-top:12px;
-          font-size:26px;
-        ">
-          ${String(jam).padStart(2, "0")}:
-          ${String(menit).padStart(2, "0")}:
-          ${String(detik).padStart(2, "0")}
-        </div>
-
-        <div style="
-          margin-top:8px;
-          font-size:14px;
-          font-weight:500;
-        ">
-          Ujian dimulai 08.30 WIB
+          UJIAN SUDAH DIMULAI
         </div>
       `;
-
-      sedangMemproses = false;
       return;
     }
 
-    // =================================================
-    // WAKTU SUDAH HABIS
-    // =================================================
+    const jam =
+      Math.floor(selisih / 3600000);
 
+    const menit =
+      Math.floor(
+        (selisih % 3600000) / 60000
+      );
+
+    const detik =
+      Math.floor(
+        (selisih % 60000) / 1000
+      );
+
+    hasil.innerHTML = `
+      <div>
+        UJIAN BELUM DIMULAI
+      </div>
+
+      <div style="
+        margin-top:12px;
+        font-size:26px;
+      ">
+        ${String(jam).padStart(2, "0")}:
+        ${String(menit).padStart(2, "0")}:
+        ${String(detik).padStart(2, "0")}
+      </div>
+
+      <div style="
+        margin-top:8px;
+        font-size:14px;
+        font-weight:500;
+      ">
+        Ujian dimulai 08.30 WIB
+      </div>
+    `;
+
+    setTimeout(
+      updateCountdownSebelumMulai,
+      1000
+    );
+  }
+
+  updateCountdownSebelumMulai();
+
+  sedangMemproses = false;
+  return;
+}
     if (sekarang >= selesai) {
 
       hasil.innerHTML = `
