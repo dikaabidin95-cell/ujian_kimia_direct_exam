@@ -447,6 +447,127 @@
       </div>
     `;
 
+        // =================================================
+    // DETEKSI MENINGGALKAN HALAMAN UJIAN
+    // =================================================
+
+    let jumlahPelanggaran = 0;
+    let halamanMeninggalkanUjian = false;
+
+    function tampilkanPeringatanUjian() {
+
+      jumlahPelanggaran++;
+
+      const overlayPeringatan =
+        document.createElement("div");
+
+      overlayPeringatan.id =
+        "overlayPeringatanUjian";
+
+      overlayPeringatan.style.cssText = `
+        position:fixed;
+        inset:0;
+        width:100vw;
+        height:100vh;
+        background:rgba(0,0,0,0.88);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        text-align:center;
+        font-family:Arial,sans-serif;
+        z-index:999999;
+        color:#ffffff;
+        padding:24px;
+      `;
+
+      overlayPeringatan.innerHTML = `
+        <div style="
+          width:100%;
+          max-width:420px;
+        ">
+
+          <div style="
+            font-size:30px;
+            font-weight:800;
+            margin-bottom:18px;
+          ">
+            PERINGATAN ${jumlahPelanggaran}
+          </div>
+
+          <div style="
+            font-size:21px;
+            font-weight:700;
+            line-height:1.4;
+          ">
+            ANDA MENINGGALKAN
+            HALAMAN UJIAN
+          </div>
+
+          <div style="
+            margin-top:16px;
+            font-size:17px;
+            line-height:1.5;
+          ">
+            Sistem mendeteksi Anda
+            berpindah dari halaman ujian.
+          </div>
+
+          <button
+            id="tombolPeringatanUjian"
+            type="button"
+            style="
+              margin-top:28px;
+              border:none;
+              border-radius:14px;
+              padding:15px 28px;
+              font-size:17px;
+              font-weight:800;
+              cursor:pointer;
+            "
+          >
+            SAYA PAHAM
+          </button>
+
+        </div>
+      `;
+
+      document.body.appendChild(
+        overlayPeringatan
+      );
+
+      document
+        .getElementById("tombolPeringatanUjian")
+        .addEventListener("click", function () {
+
+          overlayPeringatan.remove();
+
+        });
+    }
+
+    document.addEventListener(
+      "visibilitychange",
+      function () {
+
+        if (
+          document.visibilityState === "hidden"
+        ) {
+
+          halamanMeninggalkanUjian = true;
+
+        } else if (
+          document.visibilityState === "visible" &&
+          halamanMeninggalkanUjian
+        ) {
+
+          halamanMeninggalkanUjian = false;
+
+          tampilkanPeringatanUjian();
+
+        }
+
+      }
+    );
+    
     // =================================================
     // COUNTDOWN
     // =================================================
