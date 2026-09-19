@@ -447,6 +447,189 @@
       </div>
     `;
 
+        // =================================================
+    // DETEKSI MENINGGALKAN HALAMAN UJIAN
+    // =================================================
+
+    let jumlahPelanggaran = 0;
+    let halamanMeninggalkanUjian = false;
+
+    function tampilkanPeringatanUjian() {
+
+      jumlahPelanggaran++;
+
+  if (jumlahPelanggaran > 3) {
+
+    document.body.innerHTML = `
+      <div style="
+        position:fixed;
+        inset:0;
+        width:100vw;
+        height:100vh;
+        background:#f3f8ff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        text-align:center;
+        font-family:Arial,sans-serif;
+        z-index:999999;
+        padding:24px;
+      ">
+        <div style="
+          width:100%;
+          max-width:460px;
+        ">
+
+          <div style="
+            font-size:30px;
+            font-weight:800;
+            margin-bottom:18px;
+          ">
+            UJIAN DIAKHIRI
+          </div>
+
+          <div style="
+            font-size:19px;
+            font-weight:600;
+            line-height:1.5;
+          ">
+            Ujian dihentikan karena Anda
+telah melalaikan 3 kali peringatan.
+          </div>
+
+          <div style="
+            margin-top:14px;
+            font-size:16px;
+            line-height:1.5;
+          ">
+            Jawaban Anda tidak tersimpan
+          </div>
+
+          <div style="
+            margin-top:20px;
+            font-size:16px;
+            font-weight:700;
+          ">
+            Silakan tunggu arahan dari Guru.
+          </div>
+
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+      
+      const overlayPeringatan =
+        document.createElement("div");
+
+      overlayPeringatan.id =
+        "overlayPeringatanUjian";
+
+      overlayPeringatan.style.cssText = `
+        position:fixed;
+        inset:0;
+        width:100vw;
+        height:100vh;
+        background:rgba(0,0,0,0.88);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        text-align:center;
+        font-family:Arial,sans-serif;
+        z-index:999999;
+        color:#ffffff;
+        padding:24px;
+      `;
+
+      overlayPeringatan.innerHTML = `
+        <div style="
+          width:100%;
+          max-width:420px;
+        ">
+
+          <div style="
+            font-size:30px;
+            font-weight:800;
+            margin-bottom:18px;
+          ">
+            PERINGATAN ${jumlahPelanggaran}
+          </div>
+
+          <div style="
+            font-size:21px;
+            font-weight:700;
+            line-height:1.4;
+          ">
+            ANDA MENINGGALKAN
+            HALAMAN UJIAN
+          </div>
+
+          <div style="
+            margin-top:16px;
+            font-size:17px;
+            line-height:1.5;
+          ">
+            Sistem mendeteksi Anda
+            berpindah dari halaman ujian.
+          </div>
+
+          <button
+            id="tombolPeringatanUjian"
+            type="button"
+            style="
+              margin-top:28px;
+              border:none;
+              border-radius:14px;
+              padding:15px 28px;
+              font-size:17px;
+              font-weight:800;
+              cursor:pointer;
+            "
+          >
+            SAYA PAHAM
+          </button>
+
+        </div>
+      `;
+
+      document.body.appendChild(
+        overlayPeringatan
+      );
+
+      document
+        .getElementById("tombolPeringatanUjian")
+        .addEventListener("click", function () {
+
+          overlayPeringatan.remove();
+
+        });
+    }
+
+    document.addEventListener(
+      "visibilitychange",
+      function () {
+
+        if (
+          document.visibilityState === "hidden"
+        ) {
+
+          halamanMeninggalkanUjian = true;
+
+        } else if (
+          document.visibilityState === "visible" &&
+          halamanMeninggalkanUjian
+        ) {
+
+          halamanMeninggalkanUjian = false;
+
+          tampilkanPeringatanUjian();
+
+        }
+
+      }
+    );
+    
     // =================================================
     // COUNTDOWN
     // =================================================
