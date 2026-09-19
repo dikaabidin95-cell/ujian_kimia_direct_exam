@@ -266,29 +266,132 @@
       ${nis}
     </div>
     <div style="margin-top:16px;">
-      MEMBUKA UJIAN...
+      MEMERIKSA WAKTU UJIAN...
     </div>
   `;
 
-  const formUrl =
-  "https://docs.google.com/forms/d/e/1FAIpQLSevD3irL2jtXfNPSxcK61GWl-gRPqVal4qGUyzrZ3ne9Tjvow/viewform" +
-  "?usp=pp_url&entry.1283690396=" +
-  encodeURIComponent(nis);
+  // ===================================================
+  // AMBIL WAKTU SERVER
+  // ===================================================
 
-  setTimeout(function () {
+  const callbackName =
+    "waktuUjian_" + Date.now();
+
+  window[callbackName] = function (data) {
+
+    // Hapus callback
+    delete window[callbackName];
+
+    if (!data || !data.mulai || !data.selesai) {
+
+      hasil.innerHTML = `
+        <div style="color:#c62828;">
+          WAKTU UJIAN TIDAK DAPAT DIVERIFIKASI
+        </div>
+      `;
+
+      sedangMemproses = false;
+      return;
+    }
+
+    const sekarang =
+      data.serverTime;
+
+    const mulai =
+      data.mulai;
+
+    const selesai =
+      data.selesai;
+
+    // =================================================
+    // BELUM WAKTUNYA
+    // =================================================
+
+    if (sekarang < mulai) {
+
+      const selisih =
+        mulai - sekarang;
+
+      const jam =
+        Math.floor(selisih / 3600000);
+
+      const menit =
+        Math.floor(
+          (selisih % 3600000) / 60000
+        );
+
+      const detik =
+        Math.floor(
+          (selisih % 60000) / 1000
+        );
+
+      hasil.innerHTML = `
+        <div>
+          UJIAN BELUM DIMULAI
+        </div>
+
+        <div style="
+          margin-top:12px;
+          font-size:26px;
+        ">
+          ${String(jam).padStart(2, "0")}:
+          ${String(menit).padStart(2, "0")}:
+          ${String(detik).padStart(2, "0")}
+        </div>
+
+        <div style="
+          margin-top:8px;
+          font-size:14px;
+          font-weight:500;
+        ">
+          Ujian dimulai 08.30 WIB
+        </div>
+      `;
+
+      sedangMemproses = false;
+      return;
+    }
+
+    // =================================================
+    // WAKTU SUDAH HABIS
+    // =================================================
+
+    if (sekarang >= selesai) {
+
+      hasil.innerHTML = `
+        <div style="color:#c62828;">
+          UJIAN SUDAH BERAKHIR
+        </div>
+      `;
+
+      sedangMemproses = false;
+      return;
+    }
+
+    // =================================================
+    // UJIAN AKTIF
+    // =================================================
+
+    const formUrl =
+      "https://docs.google.com/forms/d/e/1FAIpQLSevD3irL2jtXfNPSxcK61GWl-gRPqVal4qGUyzrZ3ne9Tjvow/viewform" +
+      "?usp=pp_url&entry.1283690396=" +
+      encodeURIComponent(nis);
 
     document.body.innerHTML = `
-      <div style="
-        position:fixed;
-        inset:0;
-        width:100vw;
-        height:100vh;
-        margin:0;
-        padding:0;
-        background:#f3f8ff;
-        overflow:hidden;
-        z-index:99999;
-      ">
+
+      <div id="ujianContainer"
+        style="
+          position:fixed;
+          inset:0;
+          width:100vw;
+          height:100vh;
+          margin:0;
+          padding:0;
+          background:#f3f8ff;
+          overflow:hidden;
+          z-index:99999;
+        ">
+
         <iframe
           src="${formUrl}"
           allow="fullscreen; autoplay"
@@ -302,10 +405,116 @@
             padding:0;
           ">
         </iframe>
+
+        <div id="countdownUjian"
+          style="
+            position:fixed;
+            top:10px;
+            right:10px;
+            z-index:100000;
+            background:rgba(0,0,0,0.78);
+            color:#ffffff;
+            padding:8px 12px;
+            border-radius:12px;
+            font-size:15px;
+            font-weight:800;
+            line-height:1;
+            box-shadow:0 3px 10px rgba(0,0,0,0.25);
+          ">
+          60:00
+        </div>
+
       </div>
     `;
 
-  }, 800);
+    // =================================================
+    // COUNTDOWN
+    // =================================================
+
+    const selisihAwal =
+      selesai - sekarang;
+
+    const waktuAkhirLokal =
+      Date.now() + selisihAwal;
+
+    function updateCountdown() {
+
+      const sisa =
+        waktuAkhirLokal - Date.now();
+
+      if (sisa <= 0) {
+
+        const timer =
+          document.getElementById(
+            "countdownUjian"
+          );
+
+        if (timer) {
+          timer.innerText = "00:00";
+        }
+
+        return;
+      }
+
+      const totalDetik =
+        Math.floor(sisa / 1000);
+
+      const menit =
+        Math.floor(totalDetik / 60);
+
+      const detik =
+        totalDetik % 60;
+
+      const timer =
+        document.getElementById(
+          "countdownUjian"
+        );
+
+      if (timer) {
+
+        timer.innerText =
+          String(menit).padStart(2, "0") +
+          ":" +
+          String(detik).padStart(2, "0");
+
+      }
+
+      setTimeout(
+        updateCountdown,
+        250
+      );
+    }
+
+    updateCountdown();
+
+  };
+
+  // ===================================================
+  // PANGGIL API WAKTU DENGAN JSONP
+  // ===================================================
+
+  const script =
+    document.createElement("script");
+
+  script.src =
+    "https://script.google.com/macros/s/AKfycbwxeW6ZSki-s_3m04SUolyJ_Q1zEbGTgNNDDE4J4GVEV-gAyvJaspzzcLRhCFw5OE1yow/exec" +
+    "?mode=waktu&callback=" +
+    encodeURIComponent(callbackName);
+
+  script.onerror = function () {
+
+    delete window[callbackName];
+
+    hasil.innerHTML = `
+      <div style="color:#c62828;">
+        WAKTU UJIAN TIDAK DAPAT DIVERIFIKASI
+      </div>
+    `;
+
+    sedangMemproses = false;
+  };
+
+  document.body.appendChild(script);
 
 })
   .catch(function (error) {
