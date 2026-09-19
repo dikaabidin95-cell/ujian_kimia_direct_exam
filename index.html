@@ -515,8 +515,9 @@ script.onerror = function () {
 };
 
 document.head.appendChild(script);
-    
-.catch(function (error) {
+
+  })
+  .catch(function (error) {
     sedangMemproses = false;
 
     hasil.innerHTML = `
@@ -527,6 +528,7 @@ document.head.appendChild(script);
 
     console.error(error);
   });
+        
 },
 
       function () {
