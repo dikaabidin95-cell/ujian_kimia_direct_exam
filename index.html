@@ -439,85 +439,86 @@
 
     function updateCountdown() {
 
-  const sisa =
-    waktuAkhirLokal - Date.now();
+      const sisa =
+        waktuAkhirLokal - Date.now();
 
-  const timer =
-    document.getElementById(
-      "countdownUjian"
-    );
+      if (sisa <= 0) {
 
-  if (!timer) {
-    return;
-  }
+        const timer =
+          document.getElementById(
+            "countdownUjian"
+          );
 
-  if (sisa <= 0) {
+        if (timer) {
+          timer.innerText = "00:00";
+        }
 
-    timer.innerText = "00:00";
+        return;
+      }
 
-    clearInterval(intervalCountdown);
+      const totalDetik =
+        Math.floor(sisa / 1000);
 
-    return;
-  }
+      const menit =
+        Math.floor(totalDetik / 60);
 
-  const totalDetik =
-    Math.floor(sisa / 1000);
+      const detik =
+        totalDetik % 60;
 
-  const menit =
-    Math.floor(totalDetik / 60);
+      const timer =
+        document.getElementById(
+          "countdownUjian"
+        );
 
-  const detik =
-    totalDetik % 60;
+      if (timer) {
 
-  timer.innerText =
-    String(menit).padStart(2, "0") +
-    ":" +
-    String(detik).padStart(2, "0");
-}
+        timer.innerText =
+          String(menit).padStart(2, "0") +
+          ":" +
+          String(detik).padStart(2, "0");
 
-updateCountdown();
+      }
 
-const intervalCountdown =
-  setInterval(
-    updateCountdown,
-    1000
-  );
+      setTimeout(
+        updateCountdown,
+        250
+      );
+    }
 
-};
+    updateCountdown();
 
-// ===================================================
-// PANGGIL API WAKTU DENGAN JSONP
-// ===================================================
+  };
 
-const script =
-  document.createElement("script");
+  // ===================================================
+  // PANGGIL API WAKTU DENGAN JSONP
+  // ===================================================
 
-script.async = true;
+  const script =
+    document.createElement("script");
 
-script.src =
-  "https://script.google.com/macros/s/AKfycbwxeW6ZSki-s_3m04SUolyJ_Q1zEbGTgNNDDE4J4GVEV-gAyvJaspzzcLRhCFw5OE1yow/exec" +
-  "?mode=waktu&callback=" +
-  encodeURIComponent(callbackName) +
-  "&t=" +
-  Date.now();
+  script.src =
+    "https://script.google.com/macros/s/AKfycbwxeW6ZSki-s_3m04SUolyJ_Q1zEbGTgNNDDE4J4GVEV-gAyvJaspzzcLRhCFw5OE1yow/exec" +
+    "?mode=waktu&callback=" +
+    encodeURIComponent(callbackName);
 
-script.onerror = function () {
+  script.onerror = function () {
 
-  delete window[callbackName];
+    delete window[callbackName];
 
-  hasil.innerHTML = `
-    <div style="color:#c62828;">
-      WAKTU UJIAN TIDAK DAPAT DIVERIFIKASI
-    </div>
-  `;
+    hasil.innerHTML = `
+      <div style="color:#c62828;">
+        WAKTU UJIAN TIDAK DAPAT DIVERIFIKASI
+      </div>
+    `;
 
-  sedangMemproses = false;
-};
+    sedangMemproses = false;
+  };
 
-document.head.appendChild(script);
+  document.body.appendChild(script);
 
-  })
+})
   .catch(function (error) {
+
     sedangMemproses = false;
 
     hasil.innerHTML = `
@@ -528,7 +529,6 @@ document.head.appendChild(script);
 
     console.error(error);
   });
-        
 },
 
       function () {
