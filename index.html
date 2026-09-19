@@ -439,56 +439,49 @@
 
     function updateCountdown() {
 
-      const sisa =
-        waktuAkhirLokal - Date.now();
+  const sisa =
+    waktuAkhirLokal - Date.now();
 
-      if (sisa <= 0) {
+  const timer =
+    document.getElementById(
+      "countdownUjian"
+    );
 
-        const timer =
-          document.getElementById(
-            "countdownUjian"
-          );
+  if (!timer) {
+    return;
+  }
 
-        if (timer) {
-          timer.innerText = "00:00";
-        }
+  if (sisa <= 0) {
 
-        return;
-      }
+    timer.innerText = "00:00";
 
-      const totalDetik =
-        Math.floor(sisa / 1000);
+    clearInterval(intervalCountdown);
 
-      const menit =
-        Math.floor(totalDetik / 60);
+    return;
+  }
 
-      const detik =
-        totalDetik % 60;
+  const totalDetik =
+    Math.floor(sisa / 1000);
 
-      const timer =
-        document.getElementById(
-          "countdownUjian"
-        );
+  const menit =
+    Math.floor(totalDetik / 60);
 
-      if (timer) {
+  const detik =
+    totalDetik % 60;
 
-        timer.innerText =
-          String(menit).padStart(2, "0") +
-          ":" +
-          String(detik).padStart(2, "0");
+  timer.innerText =
+    String(menit).padStart(2, "0") +
+    ":" +
+    String(detik).padStart(2, "0");
+}
 
-      }
+updateCountdown();
 
-      setTimeout(
-        updateCountdown,
-        250
-      );
-    }
-
-    updateCountdown();
-
-  };
-
+const intervalCountdown =
+  setInterval(
+    updateCountdown,
+    1000
+  );
   // ===================================================
   // PANGGIL API WAKTU DENGAN JSONP
   // ===================================================
