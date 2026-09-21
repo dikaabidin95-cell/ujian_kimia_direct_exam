@@ -247,16 +247,114 @@
   const apiUrl =
     "https://script.google.com/macros/s/AKfycbwxeW6ZSki-s_3m04SUolyJ_Q1zEbGTgNNDDE4J4GVEV-gAyvJaspzzcLRhCFw5OE1yow/exec";
 
-  fetch(
-    apiUrl +
-    "?mode=catat_ujian&id=" +
-    encodeURIComponent(nis),
-    {
-      method: "GET",
-      mode: "no-cors"
-    }
-  )
-  .then(function () {
+   const namaCallback =
+    "catatUjianCallback_" + Date.now();
+
+  const hasilCatatUjian =
+    new Promise(function (resolve, reject) {
+
+      window[namaCallback] = function (data) {
+
+        delete window[namaCallback];
+
+        if (script.parentNode) {
+          script.parentNode.removeChild(script);
+        }
+
+        resolve(data);
+      };
+
+      const script =
+        document.createElement("script");
+
+      script.src =
+        apiUrl +
+        "?mode=catat_ujian&id=" +
+        encodeURIComponent(nis) +
+        "&callback=" +
+        encodeURIComponent(namaCallback);
+
+      script.onerror = function () {
+
+        delete window[namaCallback];
+
+        if (script.parentNode) {
+          script.parentNode.removeChild(script);
+        }
+
+        reject(new Error("Gagal menghubungi server."));
+      };
+
+      document.body.appendChild(script);
+    });
+
+  hasilCatatUjian
+    .then(function (hasilUjian) {
+
+      // ================================================
+      // SISWA SUDAH TERCATAT PADA SESI INI
+      // ================================================
+      if (
+        !hasilUjian ||
+        hasilUjian.berhasil !== true
+      ) {
+
+        sedangMemproses = false;
+        scanDiizinkan = false;
+
+        hasil.innerHTML = `
+          <div style="
+            font-size:30px;
+            font-weight:800;
+            margin-bottom:18px;
+          ">
+            PERINGATAN
+          </div>
+
+          <div style="
+            font-size:21px;
+            font-weight:700;
+            line-height:1.5;
+          ">
+            ${hasilUjian && hasilUjian.status === "SUDAH_TERVERIFIKASI"
+              ? "ANDA SUDAH TERCATAT PADA SESI UJIAN INI"
+              : "IDENTITAS TIDAK DAPAT DIPROSES"}
+          </div>
+
+          <div style="
+            margin-top:16px;
+            font-size:16px;
+            line-height:1.5;
+          ">
+            ${hasilUjian && hasilUjian.status === "SUDAH_TERVERIFIKASI"
+              ? "Anda tidak dapat masuk ke ujian kembali."
+              : "Silakan tunggu arahan dari guru."}
+          </div>
+        `;
+
+        return;
+      }
+
+      // ================================================
+      // SISWA BERHASIL TERCATAT
+      // LANJUT KE PEMERIKSAAN WAKTU UJIAN
+      // ================================================
+
+      hasil.innerHTML = `
+        <div>
+          NIS TERCATAT
+        </div>
+        <div style="margin-top:8px;font-size:26px;">
+          ${nis}
+        </div>
+        <div style="margin-top:16px;">
+          MEMERIKSA WAKTU UJIAN...
+        </div>
+      `;
+
+      // ===================================================
+      // AMBIL WAKTU SERVER
+      // ===================================================
 
   hasil.innerHTML = `
     <div>
@@ -279,9 +377,10 @@
 
   window[callbackName] = function (data) {
 
-    // Hapus callback
-    delete window[callbackName];
+const callbackUjian = window[callbackName];
 
+// Hapus callback
+delete window[callbackName];
     if (!data || !data.mulai || !data.selesai) {
 
       hasil.innerHTML = `
@@ -321,13 +420,15 @@
       mulai - sekarangServer;
 
     if (selisih <= 0) {
-      hasil.innerHTML = `
-        <div>
-          UJIAN SUDAH DIMULAI
-        </div>
-      `;
-      return;
-    }
+
+  callbackUjian({
+    serverTime: mulai,
+    mulai: mulai,
+    selesai: selesai
+  });
+
+  return;
+}
 
     const jam =
       Math.floor(selisih / 3600000);
@@ -361,7 +462,7 @@
         font-size:14px;
         font-weight:500;
       ">
-        Ujian dimulai 18.00 WIB
+        Ujian dimulai 20.45 WIB
       </div>
     `;
 
@@ -396,9 +497,6 @@
   "https://docs.google.com/forms/d/e/1FAIpQLSc6Ut_XCO8eiy7_4HrhwCupJa1bGORoOO049joKhvfEukdysA/viewform" +
   "?usp=pp_url&entry.488231820=" +
   encodeURIComponent(nis);
-
-
-
 
     document.body.innerHTML = `
 
