@@ -377,9 +377,10 @@
 
   window[callbackName] = function (data) {
 
-    // Hapus callback
-    delete window[callbackName];
+const callbackUjian = window[callbackName];
 
+// Hapus callback
+delete window[callbackName];
     if (!data || !data.mulai || !data.selesai) {
 
       hasil.innerHTML = `
@@ -419,13 +420,15 @@
       mulai - sekarangServer;
 
     if (selisih <= 0) {
-      hasil.innerHTML = `
-        <div>
-          UJIAN SUDAH DIMULAI
-        </div>
-      `;
-      return;
-    }
+
+  callbackUjian({
+    serverTime: mulai,
+    mulai: mulai,
+    selesai: selesai
+  });
+
+  return;
+}
 
     const jam =
       Math.floor(selisih / 3600000);
