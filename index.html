@@ -489,6 +489,42 @@ delete window[callbackName];
       return;
     }
 
+// =================================================
+// PEMERIKSAAN FULLSCREEN SEBELUM MEMBUKA SOAL
+// =================================================
+if (!document.fullscreenElement) {
+
+  hasil.innerHTML = `
+    <div style="
+      color:#c62828;
+      font-size:22px;
+      font-weight:800;
+      line-height:1.5;
+    ">
+      UJIAN TIDAK DAPAT DIBUKA
+    </div>
+
+    <div style="
+      margin-top:16px;
+      font-size:17px;
+      line-height:1.5;
+    ">
+      Layar ujian harus dalam mode fullscreen.
+    </div>
+
+    <div style="
+      margin-top:10px;
+      font-size:16px;
+      line-height:1.5;
+    ">
+      Silakan kembali ke awal dan aktifkan fullscreen.
+    </div>
+  `;
+
+  sedangMemproses = false;
+  return;
+}
+    
     // =================================================
     // UJIAN AKTIF
     // =================================================
